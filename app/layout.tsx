@@ -4,14 +4,15 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import { RefineConfig } from "@/refine-config" // Import RefineConfig
+import { RefineConfig } from "@/refine-config"
+import FloatingWhatsApp from "@/components/FloatingWhatsApp"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "PharmaStore - Your Health, Delivered",
+  title: "Shahzad Dawakhana - Your Health, Delivered",
   description: "Your trusted online pharmacy for all your medicine needs. Fast, reliable, and affordable.",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -26,6 +27,7 @@ export default function RootLayout({
           <RefineConfig>
             {children}
             <Toaster />
+            <FloatingWhatsApp />
           </RefineConfig>
         </ThemeProvider>
       </body>

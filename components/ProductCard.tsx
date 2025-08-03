@@ -72,15 +72,24 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button
-          className="w-full"
-          onClick={handleAddToCart}
-          disabled={product.stock_qty === 0} // Changed from stockQty to stock_qty
-          aria-label={`Add ${product.name} to cart`}
-        >
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Add to Cart
-        </Button>
+        <div className="flex gap-2 w-full">
+          <Button
+            variant="outline"
+            className="flex-1 bg-transparent"
+            asChild
+            aria-label={`View ${product.name} details`}
+          >
+            <Link href={`/products/${product.slug}`}>View Product</Link>
+          </Button>
+          <Button
+            className="flex-1"
+            onClick={handleAddToCart}
+            disabled={product.stock_qty === 0}
+            aria-label={`Add ${product.name} to cart`}
+          >
+            <ShoppingCart className="h-4 w-4" />
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   )

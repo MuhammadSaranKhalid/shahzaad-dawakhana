@@ -19,16 +19,6 @@ export default function HomePage() {
     },
     { name: "Vitamins", icon: "/placeholder.svg?height=64&width=64", description: "Boost your daily wellness." },
     {
-      name: "Cold & Flu",
-      icon: "/placeholder.svg?height=64&width=64",
-      description: "Relief for coughs, colds, and flu.",
-    },
-    {
-      name: "Digestive Health",
-      icon: "/placeholder.svg?height=64&width=64",
-      description: "Support for a healthy gut.",
-    },
-    {
       name: "Immune Support",
       icon: "/placeholder.svg?height=64&width=64",
       description: "Strengthen your body's defenses.",
@@ -67,13 +57,13 @@ export default function HomePage() {
           </div>
           {/* Background elements for visual interest */}
           <div className="absolute inset-0 opacity-20">
-            <Image
+          {/*  <Image
               src="/placeholder.svg?height=1000&width=1500"
               alt="Hero Background"
               layout="fill"
               objectFit="cover"
               className="z-0"
-            />
+            />*/}
           </div>
         </section>
 

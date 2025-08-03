@@ -17,7 +17,7 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold" aria-label="Home">
           <Package2 className="h-6 w-6 text-primary" />
-          <span className="text-lg">PharmaStore</span>
+          <span className="text-lg">Shahzad Dawakhana</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <Link href="/" className="text-muted-foreground hover:text-primary">
