@@ -28,10 +28,16 @@ export function Navbar() {
           </Link>
         </nav>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => setIsCartDrawerOpen(true)} aria-label="View cart">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative"
+            onClick={() => setIsCartDrawerOpen(true)}
+            aria-label="View cart"
+          >
             <ShoppingCart className="h-5 w-5" />
             {totalItems > 0 && (
-              <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
                 {totalItems}
               </Badge>
             )}
