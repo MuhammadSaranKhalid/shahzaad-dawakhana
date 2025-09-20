@@ -6,9 +6,8 @@ export interface CartItem {
   name: string
   price: number
   qty: number
-  image_url: string
-  stock_qty: number
-  slug?: string
+  image_url: string // Changed from imageUrl to image_url
+  stock_qty: number // Changed from stockQty to stock_qty
 }
 
 export interface CartStore {
@@ -19,7 +18,6 @@ export interface CartStore {
   clear: () => void
   totalItems: () => number
   totalPrice: () => number
-  addToCart: (item: any) => void
 }
 
 export const useCartStore = create<CartStore>()(
@@ -30,8 +28,10 @@ export const useCartStore = create<CartStore>()(
         set((state) => {
           const existingItem = state.items.find((i) => i.id === item.id)
           if (existingItem) {
+            // Check if adding more would exceed stock
             const newQty = existingItem.qty + quantity
             if (newQty > item.stock_qty) {
+              // Changed from stockQty to stock_qty
               console.warn(`Cannot add more than available stock for ${item.name}`)
               return { items: state.items }
             }
@@ -39,38 +39,14 @@ export const useCartStore = create<CartStore>()(
               items: state.items.map((i) => (i.id === item.id ? { ...i, qty: newQty } : i)),
             }
           } else {
+            // Check if initial quantity exceeds stock
             if (quantity > item.stock_qty) {
+              // Changed from stockQty to stock_qty
               console.warn(`Cannot add more than available stock for ${item.name}`)
               return { items: state.items }
             }
             return {
               items: [...state.items, { ...item, qty: quantity }],
-            }
-          }
-        })
-      },
-      addToCart: (item) => {
-        set((state) => {
-          const existingItem = state.items.find((i) => i.id === item.id)
-          if (existingItem) {
-            const newQty = existingItem.qty + (item.quantity || 1)
-            return {
-              items: state.items.map((i) => (i.id === item.id ? { ...i, qty: newQty } : i)),
-            }
-          } else {
-            return {
-              items: [
-                ...state.items,
-                {
-                  id: item.id,
-                  name: item.name,
-                  price: item.price,
-                  qty: item.quantity || 1,
-                  image_url: item.image || item.image_url || "/placeholder.svg",
-                  stock_qty: 100,
-                  slug: item.slug,
-                },
-              ],
             }
           }
         })
@@ -85,12 +61,13 @@ export const useCartStore = create<CartStore>()(
           items: state.items
             .map((item) => {
               if (item.id === id) {
-                const newQty = Math.max(1, Math.min(qty, item.stock_qty))
+                // Ensure quantity doesn't exceed stock and is not less than 1
+                const newQty = Math.max(1, Math.min(qty, item.stock_qty)) // Changed from stockQty to stock_qty
                 return { ...item, qty: newQty }
               }
               return item
             })
-            .filter((item) => item.qty > 0),
+            .filter((item) => item.qty > 0), // Remove if quantity becomes 0
         }))
       },
       clear: () => set({ items: [] }),
@@ -98,10 +75,8 @@ export const useCartStore = create<CartStore>()(
       totalPrice: () => get().items.reduce((total, item) => total + item.price * item.qty, 0),
     }),
     {
-      name: "medicine-cart",
-      storage: createJSONStorage(() => localStorage),
+      name: "medicine-cart", // name of the item in localStorage
+      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
     },
   ),
 )
-
-export const useStore = useCartStore

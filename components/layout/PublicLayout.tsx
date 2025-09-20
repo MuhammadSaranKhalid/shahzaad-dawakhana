@@ -1,22 +1,17 @@
-import type { ReactNode } from "react"
-import { Navbar } from "../Navbar"
-import { Footer } from "../Footer"
-import { FloatingWhatsApp } from "../FloatingWhatsApp"
+import type React from "react"
+import { Navbar } from "@/components/Navbar"
+import { Footer } from "@/components/Footer"
 
 interface PublicLayoutProps {
-  children: ReactNode
+  children: React.ReactNode
 }
 
-function PublicLayout({ children }: PublicLayoutProps) {
+export function PublicLayout({ children }: PublicLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-grow">{children}</main>
       <Footer />
-      <FloatingWhatsApp />
     </div>
   )
 }
-
-export default PublicLayout
-export { PublicLayout }
