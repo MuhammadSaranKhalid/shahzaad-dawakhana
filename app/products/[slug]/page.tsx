@@ -6,11 +6,12 @@ import { currencyFormatter } from "@/lib/helpers"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { QuantityStepper } from "@/components/QuantityStepper"
 import { useState } from "react"
 import { useCartStore } from "@/lib/store"
 import { useToast } from "@/hooks/use-toast"
-import { useList } from "@refinedev/core" // Using useList to filter by slug
+import { useList } from "@refinedev/core"
 import type { Medicine } from "@/data/products"
 import { PublicLayout } from "@/components/layout/PublicLayout"
 
@@ -21,7 +22,6 @@ interface ProductDetailsPageProps {
 }
 
 export default function ProductDetailsPage({ params }: ProductDetailsPageProps) {
-  // Use useList with a filter to find the product by slug
   const { data, isLoading, isError } = useList<Medicine>({
     resource: "medicines",
     filters: [
@@ -32,13 +32,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       },
     ],
     queryOptions: {
-      // Ensure we only fetch one item, or handle multiple if slug isn't unique
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,
     },
   })
 
-  const product = data?.data?.[0] // Get the first item from the filtered list
+  const product = data?.data?.[0]
   const [quantity, setQuantity] = useState(1)
   const addProduct = useCartStore((state) => state.add)
   const { toast } = useToast()
@@ -48,8 +47,16 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   }
 
   if (isError || !product) {
-    notFound() // If no product found or error, show 404
+    notFound()
   }
+
+  // Create multiple images array (using the same image for demo, but in real app this would come from product data)
+  const productImages = [
+    product.image_url || "/placeholder.svg?height=400&width=400",
+    product.image_url || "/placeholder-l8yoy.png",
+    product.image_url || "/medicine-package.png",
+    product.image_url || "/generic-medicine-label.png",
+  ]
 
   const handleAddToCart = () => {
     addProduct(
@@ -74,17 +81,46 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     <PublicLayout>
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Image */}
-          <div className="relative aspect-square overflow-hidden rounded-lg border">
-            <Image
-              src={product.image_url || "/placeholder.svg?height=400&width=400"}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-              placeholder={product.blurhash ? "blur" : "empty"}
-              blurDataURL={product.blurhash || undefined}
-            />
+          {/* Product Image Carousel */}
+          <div className="space-y-4">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {productImages.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative aspect-square overflow-hidden rounded-lg border">
+                      <Image
+                        src={image || "/placeholder.svg"}
+                        alt={`${product.name} - Image ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        priority={index === 0}
+                        placeholder={product.blurhash ? "blur" : "empty"}
+                        blurDataURL={product.blurhash || undefined}
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+
+            {/* Thumbnail Navigation */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {productImages.map((image, index) => (
+                <div
+                  key={index}
+                  className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-md border cursor-pointer hover:border-primary transition-colors"
+                >
+                  <Image
+                    src={image || "/placeholder.svg"}
+                    alt={`${product.name} thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Product Details */}
