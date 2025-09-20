@@ -1,15 +1,11 @@
 "use client"
 
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useCartStore } from "@/lib/store"
-import { currencyFormatter } from "@/lib/helpers"
+import { Minus, Plus, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { QuantityStepper } from "./QuantityStepper"
-import { Trash2 } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
-import { useRouter } from "next/navigation"
 
 interface CartDrawerProps {
   isOpen: boolean
@@ -17,107 +13,89 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const cartItems = useCartStore((state) => state.items)
-  const updateQty = useCartStore((state) => state.updateQty)
-  const removeItem = useCartStore((state) => state.remove)
-  const subtotal = useCartStore((state) => state.totalPrice())
-  const router = useRouter()
-
-  const shippingCost = cartItems.length > 0 ? 5.0 : 0 // Flat rate shipping
-  const total = subtotal + shippingCost
-
-  const handleUpdateQuantity = (id: string, newQty: number) => {
-    updateQty(id, newQty)
-  }
-
-  const handleRemoveItem = (id: string) => {
-    removeItem(id)
-  }
-
-  const handleCheckout = () => {
-    onClose() // Close the drawer
-    router.push("/checkout")
-  }
+  const { items, updateQty, remove, totalPrice } = useCartStore()
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="w-full sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle>Your Cart</SheetTitle>
+          <SheetTitle>Shopping Cart ({items.length} items)</SheetTitle>
         </SheetHeader>
-        <div className="flex-grow overflow-y-auto pr-4">
-          {cartItems.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">Your cart is empty.</div>
+
+        <div className="flex flex-col h-full">
+          {items.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-muted-foreground">Your cart is empty</p>
+            </div>
           ) : (
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-4">
-                  <Image
-                    src={item.image_url || "/placeholder.svg"} // Changed from imageUrl to image_url
-                    alt={item.name}
-                    width={80}
-                    height={80}
-                    className="aspect-square rounded-md object-cover"
-                  />
-                  <div className="flex-grow">
-                    <Link href={`/products/${item.slug}`} className="font-medium hover:underline" onClick={onClose}>
-                      {item.name}
-                    </Link>
-                    <p className="text-sm text-muted-foreground">{currencyFormatter.format(item.price)}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <QuantityStepper
-                        initialQuantity={item.qty}
-                        onQuantityChange={(newQty) => handleUpdateQuantity(item.id, newQty)}
-                        maxQuantity={item.stock_qty} // Changed from stockQty to stock_qty
-                        minQuantity={1}
-                        id={`drawer-qty-${item.id}`}
+            <>
+              <div className="flex-1 overflow-y-auto py-4">
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                      <Image
+                        src={item.image_url || "/placeholder.svg"}
+                        alt={item.name}
+                        width={60}
+                        height={60}
+                        className="rounded-md object-cover"
                       />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium truncate">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground">Rs. {item.price}</p>
+                        <div className="flex items-center space-x-2 mt-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 bg-transparent"
+                            onClick={() => updateQty(item.id, item.qty - 1)}
+                            disabled={item.qty <= 1}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="w-8 text-center">{item.qty}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 bg-transparent"
+                            onClick={() => updateQty(item.id, item.qty + 1)}
+                            disabled={item.qty >= item.stock_qty}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleRemoveItem(item.id)}
-                        aria-label={`Remove ${item.name} from cart`}
+                        onClick={() => remove(item.id)}
+                        className="text-red-500 hover:text-red-700"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+
+              <div className="border-t pt-4 space-y-4">
+                <div className="flex justify-between items-center font-semibold">
+                  <span>Total: Rs. {totalPrice()}</span>
+                </div>
+                <div className="space-y-2">
+                  <Link href="/cart" onClick={onClose}>
+                    <Button variant="outline" className="w-full bg-transparent">
+                      View Cart
+                    </Button>
+                  </Link>
+                  <Link href="/checkout" onClick={onClose}>
+                    <Button className="w-full">Checkout</Button>
+                  </Link>
+                </div>
+              </div>
+            </>
           )}
         </div>
-        <SheetFooter className="mt-auto pt-4 border-t">
-          <div className="w-full space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium">{currencyFormatter.format(subtotal)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Shipping</span>
-              <span className="font-medium">
-                {shippingCost === 0 ? "Free" : currencyFormatter.format(shippingCost)}
-              </span>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between text-lg font-bold">
-              <span>Total</span>
-              <span>{currencyFormatter.format(total)}</span>
-            </div>
-            <Button
-              className="w-full"
-              size="lg"
-              onClick={handleCheckout}
-              disabled={cartItems.length === 0}
-              aria-label="Proceed to checkout"
-            >
-              Proceed to Checkout
-            </Button>
-            <Button className="w-full bg-transparent" variant="outline" onClick={onClose}>
-              Continue Shopping
-            </Button>
-          </div>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   )
