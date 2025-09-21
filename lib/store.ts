@@ -1,82 +1,59 @@
 import { create } from "zustand"
-import { persist, createJSONStorage } from "zustand/middleware"
+import { persist } from "zustand/middleware"
 
-export interface CartItem {
+interface CartItem {
   id: string
   name: string
   price: number
-  qty: number
-  image_url: string // Changed from imageUrl to image_url
-  stock_qty: number // Changed from stockQty to stock_qty
+  image: string
+  quantity: number
+  slug: string
 }
 
-export interface CartStore {
+interface CartStore {
   items: CartItem[]
-  add: (item: Omit<CartItem, "qty">, quantity?: number) => void
-  remove: (id: string) => void
-  updateQty: (id: string, qty: number) => void
-  clear: () => void
-  totalItems: () => number
-  totalPrice: () => number
+  addToCart: (item: Omit<CartItem, "quantity">) => void
+  removeFromCart: (id: string) => void
+  updateQuantity: (id: string, quantity: number) => void
+  clearCart: () => void
+  getTotalItems: () => number
+  getTotalPrice: () => number
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      add: (item, quantity = 1) => {
-        set((state) => {
-          const existingItem = state.items.find((i) => i.id === item.id)
-          if (existingItem) {
-            // Check if adding more would exceed stock
-            const newQty = existingItem.qty + quantity
-            if (newQty > item.stock_qty) {
-              // Changed from stockQty to stock_qty
-              console.warn(`Cannot add more than available stock for ${item.name}`)
-              return { items: state.items }
-            }
-            return {
-              items: state.items.map((i) => (i.id === item.id ? { ...i, qty: newQty } : i)),
-            }
-          } else {
-            // Check if initial quantity exceeds stock
-            if (quantity > item.stock_qty) {
-              // Changed from stockQty to stock_qty
-              console.warn(`Cannot add more than available stock for ${item.name}`)
-              return { items: state.items }
-            }
-            return {
-              items: [...state.items, { ...item, qty: quantity }],
-            }
-          }
+      addToCart: (item) => {
+        const items = get().items
+        const existingItem = items.find((i) => i.id === item.id)
+
+        if (existingItem) {
+          set({
+            items: items.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)),
+          })
+        } else {
+          set({ items: [...items, { ...item, quantity: 1 }] })
+        }
+      },
+      removeFromCart: (id) => {
+        set({ items: get().items.filter((item) => item.id !== id) })
+      },
+      updateQuantity: (id, quantity) => {
+        if (quantity <= 0) {
+          get().removeFromCart(id)
+          return
+        }
+        set({
+          items: get().items.map((item) => (item.id === id ? { ...item, quantity } : item)),
         })
       },
-      remove: (id) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
-        }))
-      },
-      updateQty: (id, qty) => {
-        set((state) => ({
-          items: state.items
-            .map((item) => {
-              if (item.id === id) {
-                // Ensure quantity doesn't exceed stock and is not less than 1
-                const newQty = Math.max(1, Math.min(qty, item.stock_qty)) // Changed from stockQty to stock_qty
-                return { ...item, qty: newQty }
-              }
-              return item
-            })
-            .filter((item) => item.qty > 0), // Remove if quantity becomes 0
-        }))
-      },
-      clear: () => set({ items: [] }),
-      totalItems: () => get().items.reduce((total, item) => total + item.qty, 0),
-      totalPrice: () => get().items.reduce((total, item) => total + item.price * item.qty, 0),
+      clearCart: () => set({ items: [] }),
+      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
+      getTotalPrice: () => get().items.reduce((total, item) => total + item.price * item.quantity, 0),
     }),
     {
-      name: "medicine-cart", // name of the item in localStorage
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+      name: "cart-storage",
     },
   ),
 )

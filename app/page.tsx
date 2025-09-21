@@ -1,56 +1,27 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Flame, Clock, ShoppingCart, Eye } from "lucide-react"
+import { ShoppingCart, Eye } from "lucide-react"
 import { medicines } from "@/data/products"
 import { useCartStore } from "@/lib/store"
 import PublicLayout from "@/components/layout/PublicLayout"
 
 export default function HomePage() {
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 23,
-    minutes: 59,
-    seconds: 59,
-  })
-
   const addToCart = useCartStore((state) => state.addToCart)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 }
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 }
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 }
-        }
-        return prev
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
 
   const handleAddToCart = (product: any) => {
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.salePrice || product.price,
+      price: product.price,
       image: product.image,
-      quantity: 1,
+      slug: product.slug,
     })
   }
-
-  const saleProducts = medicines.slice(0, 3).map((product) => ({
-    ...product,
-    salePrice: Math.round(product.price * 0.7), // 30% off
-  }))
 
   const featuredProducts = medicines.slice(0, 4)
 
@@ -86,88 +57,6 @@ export default function HomePage() {
                   <Link href="/products">Browse Categories</Link>
                 </Button>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Flash Sale Section */}
-        <section className="py-8 md:py-12 bg-gradient-to-r from-red-500 to-orange-500 text-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center space-y-4 mb-6">
-              <div className="flex items-center justify-center gap-2">
-                <Flame className="h-6 w-6 animate-pulse" />
-                <h2 className="text-2xl md:text-3xl font-bold">Flash Sale</h2>
-                <Flame className="h-6 w-6 animate-pulse" />
-              </div>
-              <p className="text-lg opacity-90">Limited time offer - Up to 30% off!</p>
-
-              {/* Countdown Timer */}
-              <div className="flex items-center justify-center gap-4">
-                <Clock className="h-5 w-5" />
-                <div className="flex gap-2">
-                  <div className="bg-white/20 rounded-lg px-2 py-1 min-w-[50px]">
-                    <div className="text-lg font-bold">{timeLeft.hours.toString().padStart(2, "0")}</div>
-                    <div className="text-xs">Hours</div>
-                  </div>
-                  <div className="bg-white/20 rounded-lg px-2 py-1 min-w-[50px]">
-                    <div className="text-lg font-bold">{timeLeft.minutes.toString().padStart(2, "0")}</div>
-                    <div className="text-xs">Min</div>
-                  </div>
-                  <div className="bg-white/20 rounded-lg px-2 py-1 min-w-[50px]">
-                    <div className="text-lg font-bold">{timeLeft.seconds.toString().padStart(2, "0")}</div>
-                    <div className="text-xs">Sec</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-              {saleProducts.map((product) => (
-                <Card key={product.id} className="bg-white text-gray-900 hover:shadow-lg transition-shadow">
-                  <CardHeader className="p-3">
-                    <div className="relative">
-                      <div className="aspect-[4/3] relative mb-2">
-                        <Image
-                          src={product.image || "/placeholder.svg"}
-                          alt={product.name}
-                          fill
-                          className="object-cover rounded-md"
-                        />
-                      </div>
-                      <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">30% OFF</Badge>
-                    </div>
-                    <CardTitle className="text-base line-clamp-2">{product.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-3 pt-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg font-bold text-red-600">Rs. {product.salePrice}</span>
-                      <span className="text-sm text-gray-500 line-through">Rs. {product.price}</span>
-                    </div>
-                    <Badge variant={product.inStock ? "default" : "secondary"} className="text-xs">
-                      {product.inStock ? "In Stock" : "Out of Stock"}
-                    </Badge>
-                  </CardContent>
-                  <CardFooter className="p-3 pt-0">
-                    <div className="flex gap-2 w-full">
-                      <Button size="sm" variant="outline" className="flex-1 bg-transparent" asChild>
-                        <Link href={`/products/${product.slug}`}>
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Link>
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="flex-1 bg-red-600 hover:bg-red-700"
-                        onClick={() => handleAddToCart(product)}
-                        disabled={!product.inStock}
-                      >
-                        <ShoppingCart className="h-4 w-4 mr-1" />
-                        Add
-                      </Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
             </div>
           </div>
         </section>

@@ -1,178 +1,157 @@
-import { slugify } from "@/lib/helpers"
-
 export interface Medicine {
   id: string
-  slug: string
   name: string
-  brief: string
   description: string
-  dosage: string
-  warnings: string
   price: number
-  image_url?: string
-  blurhash?: string
-  stock_qty: number
+  image: string
   category: string
+  inStock: boolean
+  slug: string
+  manufacturer: string
+  dosage?: string
+  sideEffects?: string[]
+  uses?: string[]
 }
 
-// Initial mock data - this will be replaced by Supabase data in the admin panel
-// but kept for the storefront if you don't want to seed Supabase initially.
 export const medicines: Medicine[] = [
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "PainAway Max Strength",
-    brief: "Fast-acting relief for headaches and body aches.",
-    description:
-      "PainAway Max Strength provides rapid and effective relief from various types of pain, including headaches, muscle aches, and menstrual cramps. Its advanced formula targets pain at the source, ensuring you can get back to your day quickly. Non-drowsy.",
-    dosage:
-      "Adults and children 12 years and over: Take 2 caplets every 4 to 6 hours while symptoms persist. Do not exceed 8 caplets in 24 hours. Consult a doctor for children under 12.",
-    warnings:
-      "Do not use if you are allergic to any ingredients. May cause stomach upset. If pregnant or breastfeeding, consult a healthcare professional before use. Keep out of reach of children.",
-    price: 12.99,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 150,
+    id: "1",
+    name: "Panadol Extra",
+    description: "Fast relief from headaches, fever, and body aches with caffeine boost",
+    price: 120,
+    image: "/medicine-package.png",
     category: "Pain Relief",
+    inStock: true,
+    slug: "panadol-extra",
+    manufacturer: "GSK",
+    dosage: "500mg + 65mg caffeine",
+    uses: ["Headache", "Fever", "Body aches"],
+    sideEffects: ["Nausea", "Dizziness"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "AllergyGuard 24HR",
-    brief: "Non-drowsy allergy relief for a full day.",
-    description:
-      "AllergyGuard 24HR offers powerful, non-drowsy relief from common allergy symptoms like sneezing, runny nose, itchy eyes, and watery eyes. One pill provides 24 hours of continuous relief, allowing you to enjoy your day without interruption.",
-    dosage: "Adults and children 6 years and over: Take 1 tablet daily. Do not exceed recommended dosage.",
-    warnings:
-      "Do not use with other antihistamines. May cause drowsiness in some individuals. If pregnant or breastfeeding, consult a healthcare professional. Store at room temperature.",
-    price: 18.5,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 200,
-    category: "Allergy",
+    id: "2",
+    name: "Brufen 400mg",
+    description: "Anti-inflammatory pain reliever for muscle pain and inflammation",
+    price: 85,
+    image: "/generic-medicine-label.png",
+    category: "Pain Relief",
+    inStock: true,
+    slug: "brufen-400mg",
+    manufacturer: "Abbott",
+    dosage: "400mg",
+    uses: ["Muscle pain", "Inflammation", "Arthritis"],
+    sideEffects: ["Stomach upset", "Drowsiness"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "VitaBoost Daily",
-    brief: "Comprehensive multivitamin for daily wellness.",
-    description:
-      "VitaBoost Daily is a complete multivitamin formulated to support overall health and well-being. It contains essential vitamins and minerals to fill nutritional gaps and boost energy levels. Ideal for adults seeking daily nutritional support.",
-    dosage: "Adults: Take 1 tablet daily with food.",
-    warnings:
-      "Do not exceed recommended dosage. If you are pregnant, nursing, taking any medication, or have a medical condition, consult your doctor before use. Accidental overdose of iron-containing products is a leading cause of fatal poisoning in children under 6.",
-    price: 9.75,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 300,
+    id: "3",
+    name: "Vitamin D3 1000IU",
+    description: "Essential vitamin for bone health and immune system support",
+    price: 450,
+    image: "/medicine-package.png",
     category: "Vitamins",
+    inStock: true,
+    slug: "vitamin-d3-1000iu",
+    manufacturer: "Nutrifactor",
+    dosage: "1000IU",
+    uses: ["Bone health", "Immune support", "Calcium absorption"],
+    sideEffects: ["Rare allergic reactions"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "CoughEase Syrup",
-    brief: "Soothes coughs and clears congestion.",
-    description:
-      "CoughEase Syrup provides effective relief from coughs and chest congestion. Its soothing formula helps to calm irritated throats and loosen mucus, making it easier to breathe. Suitable for adults and children.",
-    dosage:
-      "Adults and children 12 years and over: Take 10 mL every 4 hours as needed. Children 6 to under 12 years: Take 5 mL every 4 hours as needed. Do not exceed 6 doses in 24 hours.",
-    price: 8.25,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 100,
-    category: "Cold & Flu",
-    warnings:
-      "Do not use if you have chronic lung disease or asthma without consulting a doctor. May cause drowsiness. Avoid alcohol. If cough persists for more than 7 days, consult a doctor.",
-  },
-  {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "Digestive Aid Pro",
-    brief: "Supports healthy digestion and nutrient absorption.",
-    description:
-      "Digestive Aid Pro is a blend of enzymes and probiotics designed to support optimal digestion and nutrient absorption. It helps reduce bloating, gas, and indigestion, promoting a comfortable digestive system.",
-    dosage: "Adults: Take 1 capsule with each meal, or as directed by a healthcare professional.",
-    warnings:
-      "Consult your doctor before use if you are pregnant, nursing, or have a medical condition. Discontinue use if adverse reactions occur. Keep out of reach of children.",
-    price: 24.0,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 80,
+    id: "4",
+    name: "Omeprazole 20mg",
+    description: "Proton pump inhibitor for acid reflux and stomach ulcers",
+    price: 180,
+    image: "/generic-medicine-label.png",
     category: "Digestive Health",
+    inStock: true,
+    slug: "omeprazole-20mg",
+    manufacturer: "Getz Pharma",
+    dosage: "20mg",
+    uses: ["Acid reflux", "Stomach ulcers", "GERD"],
+    sideEffects: ["Headache", "Nausea", "Diarrhea"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "SleepWell Melatonin",
-    brief: "Helps you fall asleep faster and stay asleep.",
-    description:
-      "SleepWell Melatonin is a natural sleep aid that helps regulate your sleep cycle, making it easier to fall asleep and enjoy a restful night. Ideal for occasional sleeplessness.",
-    dosage: "Adults: Take 1 tablet 30 minutes before bedtime. Do not exceed 1 tablet per day.",
-    warnings:
-      "May cause drowsiness. Do not drive or operate machinery after taking. Do not use if pregnant or breastfeeding. Consult a doctor if you are taking other medications or have a medical condition.",
-    price: 15.0,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 120,
-    category: "Sleep Aids",
+    id: "5",
+    name: "Multivitamin Complex",
+    description: "Complete daily vitamin and mineral supplement for overall health",
+    price: 650,
+    image: "/medicine-package.png",
+    category: "Vitamins",
+    inStock: true,
+    slug: "multivitamin-complex",
+    manufacturer: "Centrum",
+    dosage: "1 tablet daily",
+    uses: ["General health", "Energy boost", "Immune support"],
+    sideEffects: ["Mild stomach upset if taken on empty stomach"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "JointFlex Support",
-    brief: "Promotes joint health and flexibility.",
-    description:
-      "JointFlex Support is formulated with glucosamine and chondroitin to help maintain healthy cartilage and support joint flexibility and comfort. Ideal for active individuals and those experiencing joint stiffness.",
-    dosage: "Adults: Take 2 tablets daily with a meal.",
-    warnings:
-      "If you have a shellfish allergy, consult your doctor before use. If pregnant, nursing, or taking medication, consult a healthcare professional. Keep out of reach of children.",
-    price: 29.99,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 70,
-    category: "Joint Health",
+    id: "6",
+    name: "Cough Syrup",
+    description: "Effective relief from dry and productive cough with natural ingredients",
+    price: 95,
+    image: "/generic-medicine-label.png",
+    category: "Respiratory",
+    inStock: true,
+    slug: "cough-syrup",
+    manufacturer: "Hilton Pharma",
+    dosage: "10ml three times daily",
+    uses: ["Dry cough", "Productive cough", "Throat irritation"],
+    sideEffects: ["Drowsiness", "Mild dizziness"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "ImmuneBoost Plus",
-    brief: "Supports a healthy immune system.",
-    description:
-      "ImmuneBoost Plus is packed with Vitamin C, Zinc, and Echinacea to provide comprehensive support for your immune system. Helps your body's natural defenses stay strong, especially during cold and flu season.",
-    dosage: "Adults: Take 1 capsule daily with food.",
-    warnings:
-      "Consult your doctor before use if you are pregnant, nursing, or have an autoimmune condition. Discontinue use if adverse reactions occur. Not intended for long-term use.",
-    price: 14.5,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 180,
-    category: "Immune Support",
+    id: "7",
+    name: "Antibiotic Capsules",
+    description: "Broad-spectrum antibiotic for bacterial infections",
+    price: 320,
+    image: "/medicine-package.png",
+    category: "Antibiotics",
+    inStock: false,
+    slug: "antibiotic-capsules",
+    manufacturer: "Pfizer",
+    dosage: "500mg twice daily",
+    uses: ["Bacterial infections", "Respiratory infections", "Skin infections"],
+    sideEffects: ["Nausea", "Diarrhea", "Allergic reactions"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "HeartGuard Omega-3",
-    brief: "Supports cardiovascular health.",
-    description:
-      "HeartGuard Omega-3 provides essential fatty acids EPA and DHA, crucial for maintaining a healthy heart and circulatory system. Sourced from high-quality fish oil, it supports overall cardiovascular wellness.",
-    dosage: "Adults: Take 1 softgel daily with a meal.",
-    warnings:
-      "If you are pregnant, nursing, taking blood thinners, or have a medical condition, consult your doctor before use. May cause mild digestive upset. Keep out of reach of children.",
-    price: 22.0,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 90,
-    category: "Heart Health",
+    id: "8",
+    name: "Blood Pressure Tablets",
+    description: "ACE inhibitor for managing high blood pressure and heart health",
+    price: 280,
+    image: "/generic-medicine-label.png",
+    category: "Heart Care",
+    inStock: true,
+    slug: "blood-pressure-tablets",
+    manufacturer: "Novartis",
+    dosage: "10mg once daily",
+    uses: ["High blood pressure", "Heart protection", "Kidney protection"],
+    sideEffects: ["Dry cough", "Dizziness", "Fatigue"],
   },
   {
-    id: crypto.randomUUID(), // Changed to generate UUID
-    name: "CalmMind Stress Relief",
-    brief: "Helps reduce stress and promote relaxation.",
-    description:
-      "CalmMind Stress Relief is a natural blend of herbs like Ashwagandha and L-Theanine, designed to help calm the mind, reduce feelings of stress, and promote a sense of relaxation without causing drowsiness.",
-    dosage: "Adults: Take 1 capsule twice daily, or as needed.",
-    warnings:
-      "Consult your doctor before use if you are pregnant, nursing, or taking sedatives. May cause mild drowsiness in some individuals. Discontinue use if adverse reactions occur.",
-    price: 19.0,
-    image_url: "/placeholder.svg?height=400&width=400",
-    blurhash: "LGF5?I#8.R_29FNHM{_200000000",
-    stock_qty: 110,
-    category: "Mental Wellness",
+    id: "9",
+    name: "Diabetes Control",
+    description: "Metformin for type 2 diabetes management and blood sugar control",
+    price: 150,
+    image: "/medicine-package.png",
+    category: "Diabetes",
+    inStock: true,
+    slug: "diabetes-control",
+    manufacturer: "Sanofi",
+    dosage: "500mg twice daily",
+    uses: ["Type 2 diabetes", "Blood sugar control", "Insulin sensitivity"],
+    sideEffects: ["Nausea", "Diarrhea", "Metallic taste"],
+  },
+  {
+    id: "10",
+    name: "Skin Cream",
+    description: "Moisturizing and healing cream for dry and irritated skin",
+    price: 220,
+    image: "/generic-medicine-label.png",
+    category: "Skin Care",
+    inStock: true,
+    slug: "skin-cream",
+    manufacturer: "Johnson & Johnson",
+    dosage: "Apply twice daily",
+    uses: ["Dry skin", "Eczema", "Minor cuts and burns"],
+    sideEffects: ["Rare allergic reactions", "Skin irritation"],
   },
 ]
-
-// Add slugs to products
-medicines.forEach((med) => {
-  med.slug = slugify(med.name)
-})

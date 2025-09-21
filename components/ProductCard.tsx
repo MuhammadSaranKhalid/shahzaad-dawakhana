@@ -1,7 +1,6 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -26,8 +25,8 @@ export function ProductCard({ product }: ProductCardProps) {
         id: product.id,
         name: product.name,
         price: product.price,
-        image_url: product.image_url, // Changed from imageUrl to image_url
-        stock_qty: product.stock_qty, // Changed from stockQty to stock_qty
+        image_url: product.image_url,
+        stock_qty: product.stock_qty,
       },
       1,
     )
@@ -41,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <Card className="flex flex-col overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-md">
       <Link href={`/products/${product.slug}`} className="relative block aspect-square overflow-hidden">
         <Image
-          src={product.image_url || "/placeholder.svg?height=400&width=400"} // Changed to image_url
+          src={product.image_url || "/placeholder.svg?height=400&width=400"}
           alt={product.name}
           width={300}
           height={300}
@@ -60,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.brief}</p>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xl font-bold text-primary">{currencyFormatter.format(product.price)}</span>
-          {product.stock_qty === 0 ? ( // Changed from stockQty to stock_qty
+          {product.stock_qty === 0 ? (
             <Badge variant="destructive" className="text-xs">
               Out of Stock
             </Badge>
