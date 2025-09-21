@@ -1,156 +1,196 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { ShoppingCart, Star, Truck, Shield, Clock, Phone } from "lucide-react"
+import { products, categories } from "@/data/products"
+import { useCartStore } from "@/lib/store"
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ShoppingCart, Eye } from "lucide-react"
-import { medicines } from "@/data/products"
-import { useCartStore } from "@/lib/store"
 import PublicLayout from "@/components/layout/PublicLayout"
 
 export default function HomePage() {
-  const addToCart = useCartStore((state) => state.addToCart)
+  const { addToCart } = useCartStore()
 
-  const handleAddToCart = (product: any) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      slug: product.slug,
-    })
+  const featuredProducts = products.slice(0, 6)
+
+  const formatPrice = (price: number) => {
+    return `Rs. ${price.toLocaleString()}`
   }
-
-  const featuredProducts = medicines.slice(0, 4)
 
   return (
     <PublicLayout>
-      <div className="min-h-screen">
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-green-50 to-blue-50 py-20 md:py-32 overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/hero-medicines-bg.png"
-              alt="Medicine background"
-              fill
-              className="object-cover opacity-20"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-green-50/80 to-blue-50/80" />
-          </div>
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-                Your Health, <span className="text-green-600">Delivered</span>
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-green-600 to-green-800 text-white">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+                Your Trusted
+                <span className="block text-green-200">Healthcare Partner</span>
               </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                Fast, reliable, and affordable medicines delivered to your doorstep. Your trusted online pharmacy for
-                all your healthcare needs.
+              <p className="text-xl text-green-100 max-w-lg">
+                Quality medicines, expert advice, and reliable service for over 25 years. Your health is our priority.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700" asChild>
-                  <Link href="/products">Shop Medicines</Link>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="bg-white text-green-600 hover:bg-green-50">
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  Shop Now
                 </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link href="/products">Browse Categories</Link>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+                >
+                  <Phone className="mr-2 h-5 w-5" />
+                  Call Us
                 </Button>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Featured Products Section */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Products</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Discover our most popular and trusted medicines, carefully selected for your health needs.
-              </p>
+            <div className="relative">
+              <Image
+                src="/hero-medicines-bg.png"
+                alt="Medicine bottles and healthcare"
+                width={600}
+                height={400}
+                className="rounded-lg shadow-2xl"
+              />
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {featuredProducts.map((product) => (
-                <Card key={product.id} className="group hover:shadow-lg transition-shadow">
-                  <CardHeader className="p-4">
-                    <div className="aspect-square relative mb-4">
-                      <Image
-                        src={product.image || "/placeholder.svg"}
-                        alt={product.name}
-                        fill
-                        className="object-cover rounded-md group-hover:scale-105 transition-transform"
-                      />
-                    </div>
-                    <CardTitle className="text-lg line-clamp-2">{product.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-0">
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xl font-bold text-green-600">Rs. {product.price}</span>
-                      <Badge variant={product.inStock ? "default" : "secondary"}>
-                        {product.inStock ? "In Stock" : "Out of Stock"}
+      {/* Features Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Truck className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Free Delivery</h3>
+              <p className="text-gray-600">Free delivery on orders above Rs. 1000</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Quality Assured</h3>
+              <p className="text-gray-600">100% authentic medicines from licensed suppliers</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">24/7 Support</h3>
+              <p className="text-gray-600">Round the clock customer support</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Products</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Discover our most popular medicines and healthcare products, trusted by thousands of customers.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredProducts.map((product) => (
+              <Card key={product.id} className="group hover:shadow-lg transition-shadow">
+                <CardContent className="p-4">
+                  <div className="relative mb-4">
+                    <Image
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.name}
+                      width={300}
+                      height={200}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                    {product.originalPrice && (
+                      <Badge className="absolute top-2 left-2 bg-red-500">
+                        Save Rs. {product.originalPrice - product.price}
                       </Badge>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg group-hover:text-green-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm line-clamp-2">{product.description}</p>
+
+                    <div className="flex items-center space-x-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                      <span className="text-sm text-gray-500 ml-2">(4.8)</span>
                     </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <div className="flex gap-2 w-full">
-                      <Button variant="outline" className="flex-1 bg-transparent" asChild>
-                        <Link href={`/products/${product.slug}`}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Product
-                        </Link>
-                      </Button>
-                      <Button className="flex-1" onClick={() => handleAddToCart(product)} disabled={!product.inStock}>
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xl font-bold text-green-600">{formatPrice(product.price)}</span>
+                          {product.originalPrice && (
+                            <span className="text-sm text-gray-500 line-through">
+                              {formatPrice(product.originalPrice)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <Button onClick={() => addToCart(product)} className="bg-green-600 hover:bg-green-700">
                         <ShoppingCart className="h-4 w-4 mr-2" />
                         Add to Cart
                       </Button>
                     </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/products">View All Products</Link>
-              </Button>
-            </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </section>
 
-        {/* Categories Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Shop by Category</h2>
-              <p className="text-lg text-gray-600">Find the right medicine for your specific health needs</p>
-            </div>
+          <div className="text-center mt-12">
+            <Link href="/products">
+              <Button size="lg" variant="outline">
+                View All Products
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { name: "Pain Relief", icon: "💊", count: "25+ products" },
-                { name: "Vitamins", icon: "🌟", count: "30+ products" },
-                { name: "First Aid", icon: "🏥", count: "15+ products" },
-                { name: "Antibiotics", icon: "💉", count: "20+ products" },
-                { name: "Heart Care", icon: "❤️", count: "18+ products" },
-                { name: "Diabetes", icon: "🩺", count: "22+ products" },
-                { name: "Skin Care", icon: "🧴", count: "12+ products" },
-                { name: "Baby Care", icon: "👶", count: "16+ products" },
-              ].map((category) => (
-                <Card key={category.name} className="group hover:shadow-lg transition-shadow cursor-pointer">
+      {/* Categories Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
+            <p className="text-gray-600">Find the right medicine for your needs</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {categories.map((category, index) => (
+              <Link key={index} href={`/products?category=${category.name.toLowerCase().replace(" ", "-")}`}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
                   <CardContent className="p-6 text-center">
-                    <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{category.icon}</div>
-                    <h3 className="font-semibold text-lg mb-2">{category.name}</h3>
-                    <p className="text-sm text-gray-600">{category.count}</p>
+                    <div className="text-4xl mb-4">{category.icon}</div>
+                    <h3 className="font-semibold text-lg mb-2 group-hover:text-green-600 transition-colors">
+                      {category.name}
+                    </h3>
+                    <p className="text-gray-500 text-sm">{category.count} products</p>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+              </Link>
+            ))}
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </PublicLayout>
   )
 }

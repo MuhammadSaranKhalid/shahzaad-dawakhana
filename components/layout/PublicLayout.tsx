@@ -7,7 +7,7 @@ interface PublicLayoutProps {
   children: ReactNode
 }
 
-export default function PublicLayout({ children }: PublicLayoutProps) {
+function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -17,3 +17,6 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     </div>
   )
 }
+
+export default PublicLayout
+export { PublicLayout }

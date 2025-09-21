@@ -1,21 +1,23 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface CartItem {
+export interface CartItem {
   id: string
   name: string
   price: number
-  image: string
   quantity: number
-  slug: string
+  image: string
 }
 
 interface CartStore {
   items: CartItem[]
-  addToCart: (item: Omit<CartItem, "quantity">) => void
+  isOpen: boolean
+  addToCart: (product: { id: string; name: string; price: number; image: string }) => void
   removeFromCart: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
+  openCart: () => void
+  closeCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
 }
@@ -24,36 +26,50 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      addToCart: (item) => {
+      isOpen: false,
+      addToCart: (product) => {
         const items = get().items
-        const existingItem = items.find((i) => i.id === item.id)
+        const existingItem = items.find((item) => item.id === product.id)
 
         if (existingItem) {
           set({
-            items: items.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)),
+            items: items.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)),
           })
         } else {
-          set({ items: [...items, { ...item, quantity: 1 }] })
+          set({
+            items: [...items, { ...product, quantity: 1 }],
+          })
         }
       },
       removeFromCart: (id) => {
-        set({ items: get().items.filter((item) => item.id !== id) })
+        set({
+          items: get().items.filter((item) => item.id !== id),
+        })
       },
       updateQuantity: (id, quantity) => {
         if (quantity <= 0) {
           get().removeFromCart(id)
           return
         }
+
         set({
           items: get().items.map((item) => (item.id === id ? { ...item, quantity } : item)),
         })
       },
       clearCart: () => set({ items: [] }),
-      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
-      getTotalPrice: () => get().items.reduce((total, item) => total + item.price * item.quantity, 0),
+      openCart: () => set({ isOpen: true }),
+      closeCart: () => set({ isOpen: false }),
+      getTotalItems: () => {
+        return get().items.reduce((total, item) => total + item.quantity, 0)
+      },
+      getTotalPrice: () => {
+        return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
+      },
     }),
     {
       name: "cart-storage",
     },
   ),
 )
+
+export const useStore = useCartStore
