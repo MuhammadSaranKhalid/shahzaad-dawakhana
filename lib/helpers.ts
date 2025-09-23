@@ -5,7 +5,14 @@ export function slugify(text: string): string {
     .replace(/ +/g, "-")
 }
 
-export const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-})
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-PK", {
+    style: "currency",
+    currency: "PKR",
+    minimumFractionDigits: 0,
+  }).format(amount)
+}
+
+export function formatPrice(price: number): string {
+  return `Rs. ${price.toLocaleString()}`
+}

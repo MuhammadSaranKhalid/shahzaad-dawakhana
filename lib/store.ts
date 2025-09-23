@@ -12,8 +12,8 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[]
   isOpen: boolean
-  addToCart: (product: { id: string; name: string; price: number; image: string }) => void
-  removeFromCart: (id: string) => void
+  addItem: (item: Omit<CartItem, "quantity">) => void
+  removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
   openCart: () => void
@@ -27,31 +27,26 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
-      addToCart: (product) => {
+      addItem: (item) => {
         const items = get().items
-        const existingItem = items.find((item) => item.id === product.id)
+        const existingItem = items.find((i) => i.id === item.id)
 
         if (existingItem) {
           set({
-            items: items.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)),
+            items: items.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)),
           })
         } else {
-          set({
-            items: [...items, { ...product, quantity: 1 }],
-          })
+          set({ items: [...items, { ...item, quantity: 1 }] })
         }
       },
-      removeFromCart: (id) => {
-        set({
-          items: get().items.filter((item) => item.id !== id),
-        })
+      removeItem: (id) => {
+        set({ items: get().items.filter((item) => item.id !== id) })
       },
       updateQuantity: (id, quantity) => {
         if (quantity <= 0) {
-          get().removeFromCart(id)
+          get().removeItem(id)
           return
         }
-
         set({
           items: get().items.map((item) => (item.id === id ? { ...item, quantity } : item)),
         })
@@ -59,12 +54,8 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set({ items: [] }),
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
-      getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0)
-      },
-      getTotalPrice: () => {
-        return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
-      },
+      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
+      getTotalPrice: () => get().items.reduce((total, item) => total + item.price * item.quantity, 0),
     }),
     {
       name: "cart-storage",
@@ -73,3 +64,6 @@ export const useCartStore = create<CartStore>()(
 )
 
 export const useStore = useCartStore
+export const addToCart = (item: Omit<CartItem, "quantity">) => {
+  useCartStore.getState().addItem(item)
+}
