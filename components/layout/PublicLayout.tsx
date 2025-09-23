@@ -1,8 +1,9 @@
 import type React from "react"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
-import FloatingWhatsApp from "@/components/FloatingWhatsApp"
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp"
 import { CartDrawer } from "@/components/CartDrawer"
+import { Toaster } from "@/components/ui/toaster"
 
 interface PublicLayoutProps {
   children: React.ReactNode
@@ -16,6 +17,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
       <Footer />
       <FloatingWhatsApp />
       <CartDrawer />
+      <Toaster />
     </div>
   )
 }

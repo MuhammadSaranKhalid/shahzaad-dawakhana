@@ -1,30 +1,39 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useCartStore } from "@/lib/store"
 import { ShoppingCart } from "lucide-react"
-import type { Medicine } from "@/data/products"
+import { useCartStore } from "@/lib/store"
+import { useToast } from "@/hooks/use-toast"
 
 interface AddToCartButtonProps {
-  product: Medicine
+  product: {
+    id: string
+    name: string
+    price: number
+    image_url?: string
+    stock_qty: number
+  }
+  quantity?: number
+  disabled?: boolean
+  className?: string
 }
 
-export function AddToCartButton({ product }: AddToCartButtonProps) {
-  const addItem = useCartStore((state) => state.addItem)
+export function AddToCartButton({ product, quantity = 1, disabled = false, className = "" }: AddToCartButtonProps) {
+  const addProduct = useCartStore((state) => state.add)
+  const { toast } = useToast()
 
   const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
+    addProduct(product, quantity)
+    toast({
+      title: "Added to cart!",
+      description: `${product.name} has been added to your cart.`,
     })
   }
 
   return (
-    <Button size="sm" onClick={handleAddToCart} disabled={!product.inStock} className="flex items-center gap-2">
-      <ShoppingCart className="h-4 w-4" />
-      {product.inStock ? "Add to Cart" : "Out of Stock"}
+    <Button onClick={handleAddToCart} disabled={disabled} className={className}>
+      <ShoppingCart className="h-4 w-4 mr-2" />
+      Add to Cart
     </Button>
   )
 }

@@ -1,61 +1,61 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-export interface CartItem {
+interface CartItem {
   id: string
   name: string
   price: number
-  quantity: number
-  image: string
+  image_url?: string
+  stock_qty: number
+  qty: number
 }
 
 interface CartStore {
   items: CartItem[]
-  isOpen: boolean
-  addItem: (item: Omit<CartItem, "quantity">) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
-  clearCart: () => void
-  openCart: () => void
-  closeCart: () => void
-  getTotalItems: () => number
-  getTotalPrice: () => number
+  add: (product: Omit<CartItem, "qty">, quantity: number) => void
+  remove: (id: string) => void
+  updateQty: (id: string, qty: number) => void
+  clear: () => void
+  totalItems: () => number
+  totalPrice: () => number
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      isOpen: false,
-      addItem: (item) => {
+      add: (product, quantity) => {
         const items = get().items
-        const existingItem = items.find((i) => i.id === item.id)
+        const existingItem = items.find((item) => item.id === product.id)
 
         if (existingItem) {
           set({
-            items: items.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)),
+            items: items.map((item) =>
+              item.id === product.id ? { ...item, qty: Math.min(item.qty + quantity, product.stock_qty) } : item,
+            ),
           })
         } else {
-          set({ items: [...items, { ...item, quantity: 1 }] })
+          set({
+            items: [...items, { ...product, qty: Math.min(quantity, product.stock_qty) }],
+          })
         }
       },
-      removeItem: (id) => {
+      remove: (id) => {
         set({ items: get().items.filter((item) => item.id !== id) })
       },
-      updateQuantity: (id, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(id)
+      updateQty: (id, qty) => {
+        if (qty <= 0) {
+          get().remove(id)
           return
         }
+
         set({
-          items: get().items.map((item) => (item.id === id ? { ...item, quantity } : item)),
+          items: get().items.map((item) => (item.id === id ? { ...item, qty: Math.min(qty, item.stock_qty) } : item)),
         })
       },
-      clearCart: () => set({ items: [] }),
-      openCart: () => set({ isOpen: true }),
-      closeCart: () => set({ isOpen: false }),
-      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
-      getTotalPrice: () => get().items.reduce((total, item) => total + item.price * item.quantity, 0),
+      clear: () => set({ items: [] }),
+      totalItems: () => get().items.reduce((total, item) => total + item.qty, 0),
+      totalPrice: () => get().items.reduce((total, item) => total + item.price * item.qty, 0),
     }),
     {
       name: "cart-storage",
@@ -64,6 +64,3 @@ export const useCartStore = create<CartStore>()(
 )
 
 export const useStore = useCartStore
-export const addToCart = (item: Omit<CartItem, "quantity">) => {
-  useCartStore.getState().addItem(item)
-}

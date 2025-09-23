@@ -3,7 +3,7 @@
 import { MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export default function FloatingWhatsApp() {
+function FloatingWhatsApp() {
   const handleWhatsAppClick = () => {
     const phoneNumber = "+923001234567"
     const message = "Hello! I'm interested in your pharmacy products."
@@ -21,3 +21,6 @@ export default function FloatingWhatsApp() {
     </Button>
   )
 }
+
+export { FloatingWhatsApp }
+export default FloatingWhatsApp
